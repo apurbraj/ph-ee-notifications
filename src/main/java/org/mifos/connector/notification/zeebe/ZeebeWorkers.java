@@ -126,5 +126,20 @@ public class ZeebeWorkers {
                 .maxJobsActive(workerMaxJobs)
                 .open();
 
+
+        zeebeClient.newWorker()
+                .jobType("test-worker")
+                .handler((client, job) -> {
+                    logger.info("Job '{}' started from process '{}' with key {}", job.getType(), job.getBpmnProcessId(), job.getKey());
+                    Map<String, Object> variables = job.getVariablesAsMap();
+                    client.newCompleteCommand(job.getKey())
+                            .send()
+                            .join()
+                    ;
+                })
+                .name("test-worker")
+                .maxJobsActive(workerMaxJobs)
+                .open();
+
     }
 }
